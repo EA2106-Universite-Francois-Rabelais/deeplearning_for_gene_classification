@@ -34,7 +34,7 @@ exp.table[V1 %in% hypothetical.prots, MIAupstreamvalid:="nonMIA"]
 table(exp.table$MIA)
 table(exp.table$MIAupstream)
 
-#initialize cluster
+s#initialize cluster
 h2o.init()
 
 #export data to cluster
@@ -81,7 +81,7 @@ plot(mod3)
 predictions<-h2o.predict(mod3, full[,-85])
 h2o.table(predictions[,"predict"], full[,85])
 
-#introducing l2
+#introducing l2 45 TP 513 FP
 mod4<-h2o.deeplearning(y=85, x=1:84, 
                        training_frame = training.with.upstream, 
                        validation_frame = validation.with.upstream, epochs=100, 
@@ -90,7 +90,7 @@ plot(mod4)
 predictions<-h2o.predict(mod4, full[,-85])
 h2o.table(predictions[,"predict"], full[,85])
 
-#introducing l2 46 TP, 865 FP
+#introducing dropout ratio  46 TP, 865 FP
 mod5<-h2o.deeplearning(y=85, x=1:84, 
                        training_frame = training.with.upstream, 
                        validation_frame = validation.with.upstream, epochs=100, 
@@ -98,6 +98,7 @@ mod5<-h2o.deeplearning(y=85, x=1:84,
 plot(mod5)
 predictions<-h2o.predict(mod5, full[,-85])
 h2o.table(predictions[,"predict"], full[,85])
+#in this case, adding input_dropout_ratio decrease power: add more neurons
 
 #introducing l2 44 TP 483 FP
 mod6<-h2o.deeplearning(y=85, x=1:84, 
@@ -107,3 +108,13 @@ mod6<-h2o.deeplearning(y=85, x=1:84,
 plot(mod6)
 predictions<-h2o.predict(mod6, full[,-85])
 h2o.table(predictions[,"predict"], full[,85])
+
+#44TP 625 FP
+mod7<-h2o.deeplearning(y=85, x=1:84, 
+                       training_frame = training.with.upstream, 
+                       validation_frame = validation.with.upstream, epochs=100, 
+                       hidden=c(500), nfolds=10, seed=10, reproducible = T, l2=1e-05, input_dropout_ratio = 0.2)
+plot(mod7)
+predictions<-h2o.predict(mod7, full[,-85])
+h2o.table(predictions[,"predict"], full[,85])
+
